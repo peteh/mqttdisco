@@ -3,7 +3,7 @@
 
 String MqttEntity::getHomeAssistantConfigPayload()
 {
-    DynamicJsonDocument doc(2048);
+    DynamicJsonDocument doc(4096);
 
     doc["name"] = m_humanName;
 

@@ -76,7 +76,7 @@ public:
 
     void getCommandTopic(char *commandTopic_, size_t bufferSize)
     {
-        // TOOD why dont we copy from cmd topic or remove this call? 
+        // TOOD why dont we copy from cmd topic or remove this call?
         snprintf(commandTopic_, bufferSize, "%s/%s/%s", m_device->getIdentifier(), m_objectId, m_cmdSubTopic);
     }
 
@@ -85,22 +85,22 @@ public:
         return m_stateTopic;
     }
 
-    void setCustomStateTopic(const char* customStateTopic)
+    void setCustomStateTopic(const char *customStateTopic)
     {
         strncpy(m_stateTopic, customStateTopic, sizeof(m_stateTopic));
     }
 
-    void setValueTemplate(const char * valueTemplate)
+    void setValueTemplate(const char *valueTemplate)
     {
         strncpy(m_valueTemplate, valueTemplate, sizeof(m_valueTemplate));
     }
 
-    void setUnit(const char* unit)
+    void setUnit(const char *unit)
     {
         strncpy(m_unit, unit, sizeof(m_unit));
     }
 
-    void setDeviceClass(const char* deviceClass)
+    void setDeviceClass(const char *deviceClass)
     {
         strncpy(m_deviceClass, deviceClass, sizeof(m_deviceClass));
     }
@@ -134,12 +134,12 @@ public:
 protected:
     virtual void addConfig(DynamicJsonDocument &doc) = 0;
 
-    const MqttDevice* getDevice()
+    const MqttDevice *getDevice()
     {
         return m_device;
     }
 
-    const char* getObjectId()
+    const char *getObjectId()
     {
         return m_objectId;
     }
@@ -297,7 +297,6 @@ private:
     const char *m_stateUnlocked = "unlocked";
 };
 
-
 class MqttCover : public MqttEntity
 {
 public:
@@ -334,16 +333,19 @@ public:
         return m_cmdStop;
     }
 
-    // number which represents open (default: 100)
     const char *getOpeningState()
     {
         return m_stateOpening;
     }
 
-    // number which represents closed (default: 0)
     const char *getClosingState()
     {
         return m_stateClosing;
+    }
+
+    const char *getStoppedState()
+    {
+        return m_stateStopped;
     }
 
 protected:
@@ -352,12 +354,14 @@ protected:
         Serial.print("Adding config for Cover");
         doc["payload_open"] = m_cmdOpen;
         doc["payload_close"] = m_cmdClose;
-        doc["payload_stop"] = m_cmdOpen;
+        doc["payload_stop"] = m_cmdStop;
 
         doc["state_opening"] = m_stateOpening;
         doc["state_stopped"] = m_stateStopped;
-        doc["state_closing"] = m_stateStopped;
+        doc["state_closing"] = m_stateClosing;
 
+        doc["set_position_topic"] = m_cmdPositionTopic;
+        doc["position_topic"] = m_positionTopic;
         doc["position_open"] = m_positionOpen;
         doc["position_closed"] = m_positionClosed;
     }
@@ -379,5 +383,4 @@ private:
 
     char m_cmdPositionTopic[255];
     char m_positionTopic[255];
-    
 };
