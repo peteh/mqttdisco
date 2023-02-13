@@ -5,6 +5,7 @@ class MqttDevice
 {
 public:
     MqttDevice(const char *identifier, const char *name, const char *model, const char *manufacturer)
+        : m_configurationUrl("")
     {
         strncpy(m_identifier, identifier, sizeof(m_identifier));
         strncpy(m_name, name, sizeof(m_name));
@@ -33,11 +34,30 @@ public:
         return m_manufacturer;
     }
 
+    void setConfigurationUrl(char *configurationUrl)
+    {
+        strncpy(m_configurationUrl, configurationUrl, sizeof(m_configurationUrl));
+    }
+
+    void addConfig(DynamicJsonDocument &doc) const
+    {
+        JsonObject device = doc.createNestedObject("device");
+        device["identifiers"][0] = getIdentifier();
+        device["name"] = getName();
+        device["model"] = getModel();
+        device["manufacturer"] = getManufacturer();
+        if (strlen(m_configurationUrl) > 0)
+        {
+            device["configuration_url"] = m_configurationUrl;
+        }
+    }
+
 private:
     char m_identifier[64];
     char m_name[64];
     char m_model[64];
     char m_manufacturer[64];
+    char m_configurationUrl[256];
 };
 
 class MqttEntity
