@@ -263,7 +263,6 @@ public:
 protected:
     virtual void addConfig(DynamicJsonDocument &doc)
     {
-        Serial.print("Adding config for Switch");
         doc["state_on"] = m_stateOn;
         doc["state_off"] = m_stateOff;
         doc["payload_on"] = m_stateOn;
@@ -302,7 +301,6 @@ public:
 protected:
     virtual void addConfig(DynamicJsonDocument &doc)
     {
-        Serial.print("Adding config for Text");
         if (strlen(m_pattern) > 0)
         {
             doc["pattern"] = m_pattern;
@@ -360,7 +358,6 @@ public:
 protected:
     virtual void addConfig(DynamicJsonDocument &doc)
     {
-        Serial.print("Adding config for Lock");
         doc["payload_lock"] = m_cmdLock;
         doc["payload_unlock"] = m_cmdUnlock;
         doc["payload_open"] = m_cmdOpen;
@@ -430,7 +427,6 @@ public:
 protected:
     virtual void addConfig(DynamicJsonDocument &doc)
     {
-        Serial.print("Adding config for Cover");
         doc["payload_open"] = m_cmdOpen;
         doc["payload_close"] = m_cmdClose;
         doc["payload_stop"] = m_cmdStop;
