@@ -1,0 +1,37 @@
+{
+  "name": "libesplog",
+  "version": "0.0.1",
+  "description": "A library to create Homeassistant MQTT entities",
+  "keywords": "homeassistant, mqtt, entities",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/peteh/mqttdisco.git"
+  },
+  "authors":
+  [
+    {
+      "name": "Pete",
+      "email": "",
+      "url": "https://www.peterhofmann.me",
+      "maintainer": true
+    }
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/peteh/mqttdisco",
+  "dependencies": [
+    {
+      "name": "PubSubClient",
+      "version": "knolleary/PubSubClient@^2.8"
+    },
+    {
+      "name": "ArduinoJson",
+      "version": "bblanchon/ArduinoJson@^6.19.4"
+    }
+  ],
+  "frameworks": "Arduino",
+  "platforms": [
+    "espressif32", 
+    "espressif8266"
+  ]
+}
