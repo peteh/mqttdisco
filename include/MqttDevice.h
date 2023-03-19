@@ -302,10 +302,10 @@ public:
 protected:
     virtual void addConfig(DynamicJsonDocument &doc)
     {
-        JsonArray nested = doc["options"].createNestedArray();
+        JsonArray array = doc["options"];
         for(String option : m_options) 
         {
-            nested.add(option);
+            array.add(option);
         }
     }
 
