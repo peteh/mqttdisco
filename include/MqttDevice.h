@@ -1,8 +1,12 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
-
-enum EntityCategory { NONE, DIAGNOSTIC, CONFIG };
+enum EntityCategory
+{
+    NONE,
+    DIAGNOSTIC,
+    CONFIG
+};
 
 class MqttDevice
 {
@@ -176,7 +180,7 @@ private:
     const MqttDevice *m_device; // the device this entity belongs to
     char m_objectId[64];        // our actual device identifier, e.g. doorbell, must be unique within the nodeid
     char m_type[16];            // mqtt device type, e.g. switch
-    char m_uniqueId[128];        // the unique identifier, e.g. doorman2323-doorbell
+    char m_uniqueId[128];       // the unique identifier, e.g. doorman2323-doorbell
     char m_humanName[64];       // human readbable name, e.g. Door Bell
 
     bool m_hasCommandTopic = false;
@@ -272,6 +276,40 @@ protected:
 private:
     const char *m_stateOn = "on";
     const char *m_stateOff = "off";
+};
+
+class MqttSelect : public MqttEntity
+{
+public:
+    MqttSelect(MqttDevice *device, const char *objectId, const char *humanName)
+        : MqttEntity(device, objectId, "select", humanName)
+        , m_options()
+    {
+        setHasCommandTopic(true);
+    }
+
+    const char *getOption(uint8_t index)
+    {
+        return m_options[index].c_str(); // you can access the elements just like if it was a regular array
+    }
+
+    void addOption(const char *option)
+    {
+        m_options.push_back(String(option)); 
+    }
+
+protected:
+    virtual void addConfig(DynamicJsonDocument &doc)
+    {
+        JsonArray nested = doc["options"].createNestedArray();
+        for(String option : m_options) 
+        {
+            nested.add(option);
+        }
+    }
+
+private:
+    std::vector<String> m_options;
 };
 
 class MqttText : public MqttEntity

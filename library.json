@@ -1,7 +1,7 @@
 {
-  "name": "libesplog",
+  "name": "libmqttdisco",
   "version": "0.0.1",
-  "description": "A library to create Homeassistant MQTT entities",
+  "description": "A library to create Homeassistant MQTT entities so that they are automatically discovered. ",
   "keywords": "homeassistant, mqtt, entities",
   "repository":
   {
