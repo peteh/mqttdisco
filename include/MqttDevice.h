@@ -219,7 +219,7 @@ public:
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc)
+    virtual void addConfig(DynamicJsonDocument &doc) override
     {
         doc["payload_on"] = m_stateOn;
         doc["payload_off"] = m_stateOff;
@@ -232,18 +232,44 @@ private:
 
 class MqttSensor : public MqttEntity
 {
+    enum StateClass
+    {
+        NONE,
+        MEASUREMENT,
+        TOTAL,
+        TOTAL_INCREASING
+    };
+
 public:
     MqttSensor(MqttDevice *device, const char *objectId, const char *humanName)
         : MqttEntity(device, objectId, "sensor", humanName)
     {
     }
 
-protected:
-    virtual void addConfig(DynamicJsonDocument &doc)
+    void setStateClass(StateClass stateClass)
     {
-        // doc["payload_on"] = m_stateOn;
-        // doc["payload_off"] = m_stateOff;
+        m_stateClass = stateClass;
     }
+
+protected:
+    virtual void addConfig(DynamicJsonDocument &doc) override
+    {
+        switch (m_stateClass)
+        {
+        case MEASUREMENT:
+            doc["state_class"] = "measurement";
+            break;
+        case TOTAL:
+            doc["state_class"] = "total";
+            break;
+        case TOTAL_INCREASING:
+            doc["state_class"] = "total_increasing";
+            break;
+        }
+    }
+
+private:
+    StateClass m_stateClass = StateClass::NONE;
 };
 
 class MqttSwitch : public MqttEntity
@@ -283,8 +309,7 @@ class MqttSelect : public MqttEntity
 {
 public:
     MqttSelect(MqttDevice *device, const char *objectId, const char *humanName)
-        : MqttEntity(device, objectId, "select", humanName)
-        , m_options()
+        : MqttEntity(device, objectId, "select", humanName), m_options()
     {
         setHasCommandTopic(true);
     }
@@ -296,16 +321,16 @@ public:
 
     void addOption(const char *option)
     {
-        m_options.push_back(String(option)); 
+        m_options.push_back(String(option));
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc)
+    virtual void addConfig(DynamicJsonDocument &doc) override
     {
         JsonArray array = doc["options"];
-        for(String option : m_options) 
+        for (uint i = 0; i < m_options.size(); i++)
         {
-            array.add(option);
+            doc["options"][i].add(m_options[i]);
         }
     }
 
@@ -338,7 +363,7 @@ public:
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc)
+    virtual void addConfig(DynamicJsonDocument &doc) override
     {
         if (strlen(m_pattern) > 0)
         {
@@ -395,7 +420,7 @@ public:
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc)
+    virtual void addConfig(DynamicJsonDocument &doc) override
     {
         doc["payload_lock"] = m_cmdLock;
         doc["payload_unlock"] = m_cmdUnlock;
@@ -464,7 +489,7 @@ public:
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc)
+    virtual void addConfig(DynamicJsonDocument &doc) override
     {
         doc["payload_open"] = m_cmdOpen;
         doc["payload_close"] = m_cmdClose;
