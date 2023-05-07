@@ -232,6 +232,7 @@ private:
 
 class MqttSensor : public MqttEntity
 {
+public:
     enum StateClass
     {
         NONE,
@@ -240,7 +241,6 @@ class MqttSensor : public MqttEntity
         TOTAL_INCREASING
     };
 
-public:
     MqttSensor(MqttDevice *device, const char *objectId, const char *humanName)
         : MqttEntity(device, objectId, "sensor", humanName)
     {
