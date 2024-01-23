@@ -45,7 +45,7 @@ public:
 
     const char *getSWVersion() const
     {
-        return m_manufacturer;
+        return m_swVersion;
     }
 
     void setConfigurationUrl(const char *configurationUrl)
