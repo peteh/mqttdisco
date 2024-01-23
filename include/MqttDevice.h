@@ -13,7 +13,8 @@ class MqttDevice
 {
 public:
     MqttDevice(const char *identifier, const char *name, const char *model, const char *manufacturer)
-        : m_configurationUrl("")
+        : m_configurationUrl(""),
+        m_swVersion("")
     {
         strncpy(m_identifier, identifier, sizeof(m_identifier));
         strncpy(m_name, name, sizeof(m_name));
@@ -42,9 +43,19 @@ public:
         return m_manufacturer;
     }
 
+    const char *getSWVersion() const
+    {
+        return m_manufacturer;
+    }
+
     void setConfigurationUrl(char *configurationUrl)
     {
         strncpy(m_configurationUrl, configurationUrl, sizeof(m_configurationUrl));
+    }
+
+    void setSWVersion(char *swVersion)
+    {
+        strncpy(m_swVersion, swVersion, sizeof(m_swVersion));
     }
 
     void addConfig(DynamicJsonDocument &doc) const
@@ -54,6 +65,11 @@ public:
         device["name"] = getName();
         device["model"] = getModel();
         device["manufacturer"] = getManufacturer();
+
+        if (strlen(m_swVersion) > 0)
+        {
+            device["sw_version"] = getSWVersion();
+        }
         if (strlen(m_configurationUrl) > 0)
         {
             device["configuration_url"] = m_configurationUrl;
@@ -65,6 +81,7 @@ private:
     char m_name[64];
     char m_model[64];
     char m_manufacturer[64];
+    char m_swVersion[16];
     char m_configurationUrl[256];
 };
 
