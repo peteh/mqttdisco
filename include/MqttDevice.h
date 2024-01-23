@@ -265,6 +265,9 @@ protected:
         case TOTAL_INCREASING:
             doc["state_class"] = "total_increasing";
             break;
+        case NONE:
+            // nothing needed
+            break;
         }
     }
 
@@ -305,6 +308,30 @@ private:
     const char *m_stateOff = "off";
 };
 
+class MqttButton : public MqttEntity
+{
+public:
+    MqttButton(MqttDevice *device, const char *objectId, const char *humanName)
+        : MqttEntity(device, objectId, "button", humanName)
+    {
+        setHasCommandTopic(true);
+    }
+
+    const char *getPressState()
+    {
+        return m_statePress;
+    }
+
+protected:
+    virtual void addConfig(DynamicJsonDocument &doc)
+    {
+        doc["payload_press"] = m_statePress;
+    }
+
+private:
+    const char *m_statePress = "PRESS";
+};
+
 class MqttSelect : public MqttEntity
 {
 public:
@@ -327,7 +354,6 @@ public:
 protected:
     virtual void addConfig(DynamicJsonDocument &doc) override
     {
-        JsonArray array = doc["options"];
         for (uint i = 0; i < m_options.size(); i++)
         {
             doc["options"][i].add(m_options[i]);
