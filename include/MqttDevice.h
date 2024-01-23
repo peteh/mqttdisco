@@ -48,12 +48,12 @@ public:
         return m_manufacturer;
     }
 
-    void setConfigurationUrl(char *configurationUrl)
+    void setConfigurationUrl(const char *configurationUrl)
     {
         strncpy(m_configurationUrl, configurationUrl, sizeof(m_configurationUrl));
     }
 
-    void setSWVersion(char *swVersion)
+    void setSWVersion(const char *swVersion)
     {
         strncpy(m_swVersion, swVersion, sizeof(m_swVersion));
     }
