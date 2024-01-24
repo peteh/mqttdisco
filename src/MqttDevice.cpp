@@ -19,6 +19,9 @@ String MqttEntity::getHomeAssistantConfigPayload()
     // doc["state_topic"] = "~/state";
     doc["state_topic"] = m_stateTopic;
 
+    // set new naming scheme for homeassistant
+    doc["has_entity_name"] = true;
+
     // add the other configurations
     addConfig(doc);
 
