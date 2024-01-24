@@ -325,6 +325,46 @@ private:
     const char *m_stateOff = "off";
 };
 
+class MqttSiren : public MqttEntity
+{
+public:
+    MqttSiren(MqttDevice *device, const char *objectId, const char *humanName)
+        : MqttEntity(device, objectId, "siren", humanName)
+    {
+        setHasCommandTopic(true);
+    }
+
+    const char *getOnState()
+    {
+        return m_stateOn;
+    }
+
+    const char *getOffState()
+    {
+        return m_stateOff;
+    }
+
+protected:
+    virtual void addConfig(DynamicJsonDocument &doc)
+    {
+        doc["state_on"] = m_stateOn;
+        doc["state_off"] = m_stateOff;
+        doc["payload_on"] = m_stateOn;
+        doc["payload_off"] = m_stateOff;
+
+        // TODO: make this configurable
+        doc["support_duration"] = m_supportDuration;
+        doc["support_volume_set"] = m_supportVolumeSet;
+    }
+
+private:
+    const char *m_stateOn = "on";
+    const char *m_stateOff = "off";
+
+    bool m_supportDuration = false;
+    bool m_supportVolumeSet = false;
+};
+
 class MqttButton : public MqttEntity
 {
 public:
