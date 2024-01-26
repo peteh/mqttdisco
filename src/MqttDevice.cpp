@@ -1,6 +1,6 @@
 #include "MqttDevice.h"
 
-String MqttEntity::getHomeAssistantConfigPayload()
+String MqttEntity::getHomeAssistantConfigPayload() const
 {
     DynamicJsonDocument doc(4096);
 

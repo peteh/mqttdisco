@@ -1,3 +1,4 @@
+#pragma once
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <vector>
@@ -12,9 +13,14 @@ enum EntityCategory
 class MqttDevice
 {
 public:
+    MqttDevice()
+        : MqttDevice("", "", "", "")
+    {
+    }
+
     MqttDevice(const char *identifier, const char *name, const char *model, const char *manufacturer)
-        : m_configurationUrl(""),
-        m_swVersion("")
+        : m_swVersion(""),
+          m_configurationUrl("")
     {
         strncpy(m_identifier, identifier, sizeof(m_identifier));
         strncpy(m_name, name, sizeof(m_name));
@@ -96,7 +102,7 @@ public:
         strncpy(m_humanName, humanName, sizeof(m_humanName));
 
         snprintf(m_cmdTopic, sizeof(m_cmdTopic), "%s/%s/%s", m_device->getIdentifier(), m_objectId, m_cmdSubTopic);
-        snprintf(m_stateTopic, sizeof(m_cmdTopic), "%s/%s/%s", m_device->getIdentifier(), m_objectId, m_stateSubTopic);
+        snprintf(m_stateTopic, sizeof(m_stateTopic), "%s/%s/%s", m_device->getIdentifier(), m_objectId, m_stateSubTopic);
         snprintf(m_uniqueId, sizeof(m_uniqueId), "%s-%s", m_device->getIdentifier(), m_objectId);
     }
 
@@ -105,12 +111,12 @@ public:
         m_hasCommandTopic = hasCommand;
     }
 
-    void getBaseTopic(char *baseTopic_, size_t bufferSize)
+    void getBaseTopic(char *baseTopic_, size_t bufferSize) const
     {
         snprintf(baseTopic_, bufferSize, "%s/%s", m_device->getIdentifier(), m_objectId);
     }
 
-    const char *getCommandTopic()
+    const char *getCommandTopic() const
     {
         return m_cmdTopic;
     }
@@ -120,7 +126,7 @@ public:
         snprintf(commandTopic_, bufferSize, "%s/%s/%s", m_device->getIdentifier(), m_objectId, m_cmdSubTopic);
     }
 
-    const char *getStateTopic()
+    const char *getStateTopic() const
     {
         return m_stateTopic;
     }
@@ -155,7 +161,7 @@ public:
         m_entityType = type;
     }
 
-    const char *getHumanName()
+    const char *getHumanName() const
     {
         return m_humanName;
     }
@@ -177,19 +183,19 @@ public:
                  m_objectId);
     }
 
-    String getHomeAssistantConfigPayload();
+    String getHomeAssistantConfigPayload() const;
 
-    String getOnlineState();
+    String getOnlineState() const;
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) = 0;
+    virtual void addConfig(DynamicJsonDocument &doc) const = 0;
 
-    const MqttDevice *getDevice()
+    const MqttDevice *getDevice() const
     {
         return m_device;
     }
 
-    const char *getObjectId()
+    const char *getObjectId() const
     {
         return m_objectId;
     }
@@ -220,31 +226,36 @@ private:
 class MqttBinarySensor : public MqttEntity
 {
 public:
+    MqttBinarySensor()
+        : MqttBinarySensor(nullptr, "", "")
+    {
+    }
+
     MqttBinarySensor(MqttDevice *device, const char *objectId, const char *humanName)
         : MqttEntity(device, objectId, "binary_sensor", humanName)
     {
     }
 
-    const char *getOnState()
+    const char *getOnState() const
     {
         return m_stateOn;
     }
 
-    const char *getOffState()
+    const char *getOffState() const
     {
         return m_stateOff;
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) override
+    virtual void addConfig(DynamicJsonDocument &doc) const override
     {
         doc["payload_on"] = m_stateOn;
         doc["payload_off"] = m_stateOff;
     }
 
 private:
-    const char *m_stateOn = "on";
-    const char *m_stateOff = "off";
+    static constexpr const char *m_stateOn = "on";
+    static constexpr const char *m_stateOff = "off";
 };
 
 class MqttSensor : public MqttEntity
@@ -258,6 +269,11 @@ public:
         TOTAL_INCREASING
     };
 
+    MqttSensor()
+        : MqttSensor(nullptr, "", "")
+    {
+    }
+
     MqttSensor(MqttDevice *device, const char *objectId, const char *humanName)
         : MqttEntity(device, objectId, "sensor", humanName)
     {
@@ -269,7 +285,7 @@ public:
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) override
+    virtual void addConfig(DynamicJsonDocument &doc) const override
     {
         switch (m_stateClass)
         {
@@ -295,24 +311,29 @@ private:
 class MqttSwitch : public MqttEntity
 {
 public:
+    MqttSwitch()
+        : MqttSwitch(nullptr, "", "")
+    {
+    }
+
     MqttSwitch(MqttDevice *device, const char *objectId, const char *humanName)
         : MqttEntity(device, objectId, "switch", humanName)
     {
         setHasCommandTopic(true);
     }
 
-    const char *getOnState()
+    const char *getOnState() const
     {
         return m_stateOn;
     }
 
-    const char *getOffState()
+    const char *getOffState() const
     {
         return m_stateOff;
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc)
+    virtual void addConfig(DynamicJsonDocument &doc) const override
     {
         doc["state_on"] = m_stateOn;
         doc["state_off"] = m_stateOff;
@@ -321,31 +342,36 @@ protected:
     }
 
 private:
-    const char *m_stateOn = "on";
-    const char *m_stateOff = "off";
+    static constexpr const char *m_stateOn = "on";
+    static constexpr const char *m_stateOff = "off";
 };
 
 class MqttSiren : public MqttEntity
 {
 public:
+    MqttSiren()
+        : MqttSiren(nullptr, "", "")
+    {
+    }
+
     MqttSiren(MqttDevice *device, const char *objectId, const char *humanName)
         : MqttEntity(device, objectId, "siren", humanName)
     {
         setHasCommandTopic(true);
     }
 
-    const char *getOnState()
+    const char *getOnState() const
     {
         return m_stateOn;
     }
 
-    const char *getOffState()
+    const char *getOffState() const
     {
         return m_stateOff;
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc)
+    virtual void addConfig(DynamicJsonDocument &doc) const override
     {
         doc["state_on"] = m_stateOn;
         doc["state_off"] = m_stateOff;
@@ -358,8 +384,8 @@ protected:
     }
 
 private:
-    const char *m_stateOn = "on";
-    const char *m_stateOff = "off";
+    static constexpr const char *m_stateOn = "on";
+    static constexpr const char *m_stateOff = "off";
 
     bool m_supportDuration = false;
     bool m_supportVolumeSet = false;
@@ -374,19 +400,19 @@ public:
         setHasCommandTopic(true);
     }
 
-    const char *getPressState()
+    const char *getPressState() const
     {
         return m_statePress;
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc)
+    virtual void addConfig(DynamicJsonDocument &doc) const override
     {
         doc["payload_press"] = m_statePress;
     }
 
 private:
-    const char *m_statePress = "PRESS";
+    static constexpr const char *m_statePress = "PRESS";
 };
 
 class MqttSelect : public MqttEntity
@@ -398,7 +424,7 @@ public:
         setHasCommandTopic(true);
     }
 
-    const char *getOption(uint8_t index)
+    const char *getOption(uint8_t index) const
     {
         return m_options[index].c_str(); // you can access the elements just like if it was a regular array
     }
@@ -409,7 +435,7 @@ public:
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) override
+    virtual void addConfig(DynamicJsonDocument &doc) const override
     {
         for (uint i = 0; i < m_options.size(); i++)
         {
@@ -446,7 +472,7 @@ public:
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) override
+    virtual void addConfig(DynamicJsonDocument &doc) const override
     {
         if (strlen(m_pattern) > 0)
         {
@@ -477,33 +503,33 @@ public:
         setHasCommandTopic(true);
     }
 
-    const char *getLockCommand()
+    const char *getLockCommand() const
     {
         return m_cmdLock;
     }
 
-    const char *getUnlockCommand()
+    const char *getUnlockCommand() const
     {
         return m_cmdUnlock;
     }
 
-    const char *getOpenCommand()
+    const char *getOpenCommand() const
     {
         return m_cmdOpen;
     }
 
-    const char *getLockedState()
+    const char *getLockedState() const
     {
         return m_stateLocked;
     }
 
-    const char *getUnlockedState()
+    const char *getUnlockedState() const
     {
         return m_stateUnlocked;
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) override
+    virtual void addConfig(DynamicJsonDocument &doc) const override
     {
         doc["payload_lock"] = m_cmdLock;
         doc["payload_unlock"] = m_cmdUnlock;
@@ -513,11 +539,11 @@ protected:
     }
 
 private:
-    const char *m_cmdLock = "lock";
-    const char *m_cmdUnlock = "unlock";
-    const char *m_cmdOpen = "open";
-    const char *m_stateLocked = "locked";
-    const char *m_stateUnlocked = "unlocked";
+    static constexpr const char *m_cmdLock = "lock";
+    static constexpr const char *m_cmdUnlock = "unlock";
+    static constexpr const char *m_cmdOpen = "open";
+    static constexpr const char *m_stateLocked = "locked";
+    static constexpr const char *m_stateUnlocked = "unlocked";
 };
 
 class MqttCover : public MqttEntity
@@ -531,48 +557,48 @@ public:
         snprintf(m_positionTopic, sizeof(m_positionTopic), "%s/%s/%s", getDevice()->getIdentifier(), getObjectId(), m_positionSubTopic);
     }
 
-    const char *getCommandPositionTopic()
+    const char *getCommandPositionTopic() const
     {
         return m_cmdPositionTopic;
     }
 
-    const char *getPositionTopic()
+    const char *getPositionTopic() const
     {
         return m_positionTopic;
     }
 
-    const char *getOpenCommand()
+    const char *getOpenCommand() const
     {
         return m_cmdOpen;
     }
 
-    const char *getCloseCommand()
+    const char *getCloseCommand() const
     {
         return m_cmdClose;
     }
 
-    const char *getStopCommand()
+    const char *getStopCommand() const
     {
         return m_cmdStop;
     }
 
-    const char *getOpeningState()
+    const char *getOpeningState() const
     {
         return m_stateOpening;
     }
 
-    const char *getClosingState()
+    const char *getClosingState() const
     {
         return m_stateClosing;
     }
 
-    const char *getStoppedState()
+    const char *getStoppedState() const
     {
         return m_stateStopped;
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) override
+    virtual void addConfig(DynamicJsonDocument &doc) const override
     {
         doc["payload_open"] = m_cmdOpen;
         doc["payload_close"] = m_cmdClose;
@@ -589,19 +615,19 @@ protected:
     }
 
 private:
-    const char *m_cmdOpen = "open";
-    const char *m_cmdClose = "close";
-    const char *m_cmdStop = "stop";
+    static constexpr const char *m_cmdOpen = "open";
+    static constexpr const char *m_cmdClose = "close";
+    static constexpr const char *m_cmdStop = "stop";
 
-    const char *m_stateOpening = "opening";
-    const char *m_stateClosing = "closing";
-    const char *m_stateStopped = "stopped";
+    static constexpr const char *m_stateOpening = "opening";
+    static constexpr const char *m_stateClosing = "closing";
+    static constexpr const char *m_stateStopped = "stopped";
 
-    const uint8_t m_positionOpen = 100;
-    const uint8_t m_positionClosed = 0;
+    static constexpr const uint8_t m_positionOpen = 100;
+    static constexpr const uint8_t m_positionClosed = 0;
 
-    const char *m_cmdPositionSubTopic = "cmd_position";
-    const char *m_positionSubTopic = "position";
+    static constexpr const char *m_cmdPositionSubTopic = "cmd_position";
+    static constexpr const char *m_positionSubTopic = "position";
 
     char m_cmdPositionTopic[255];
     char m_positionTopic[255];
