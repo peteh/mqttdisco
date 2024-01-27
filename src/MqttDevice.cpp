@@ -4,7 +4,16 @@ String MqttEntity::getHomeAssistantConfigPayload() const
 {
     DynamicJsonDocument doc(4096);
 
-    doc["name"] = m_humanName;
+    // if we give no human name to the entity
+    // it will get the name of the device instead
+    if (strlen(m_humanName) == 0)
+    {
+        doc["name"] = nullptr;
+    }
+    else
+    {
+        doc["name"] = m_humanName;
+    }
 
     doc["unique_id"] = m_uniqueId;
 
