@@ -523,9 +523,19 @@ public:
         return m_stateLocked;
     }
 
+    const char *getLockingState() const
+    {
+        return m_stateLocking;
+    }
+
     const char *getUnlockedState() const
     {
         return m_stateUnlocked;
+    }
+
+    const char *getUnlockingState() const
+    {
+        return m_stateUnlocking;
     }
 
 protected:
@@ -535,7 +545,9 @@ protected:
         doc["payload_unlock"] = m_cmdUnlock;
         doc["payload_open"] = m_cmdOpen;
         doc["state_locked"] = m_stateLocked;
+        doc["state_locking"] = m_stateLocking;
         doc["state_unlocked"] = m_stateUnlocked;
+        doc["state_unlocking"] = m_stateUnlocking;
     }
 
 private:
@@ -543,7 +555,9 @@ private:
     static constexpr const char *m_cmdUnlock = "unlock";
     static constexpr const char *m_cmdOpen = "open";
     static constexpr const char *m_stateLocked = "locked";
+    static constexpr const char *m_stateLocking = "locking";
     static constexpr const char *m_stateUnlocked = "unlocked";
+    static constexpr const char *m_stateUnlocking = "unlocking";
 };
 
 class MqttCover : public MqttEntity
