@@ -2,12 +2,20 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <vector>
+#include <cfloat>
 
 enum EntityCategory
 {
     NONE,
     DIAGNOSTIC,
     CONFIG
+};
+
+enum NumberMode
+{
+    AUTO,
+    SLIDER,
+    BOX
 };
 
 class MqttDevice
@@ -64,9 +72,10 @@ public:
         strncpy(m_swVersion, swVersion, sizeof(m_swVersion));
     }
 
-    void addConfig(DynamicJsonDocument &doc) const
+    void addConfig(JsonDocument &doc) const
     {
-        JsonObject device = doc.createNestedObject("device");
+        JsonObject device = doc["device"].to<JsonObject>();
+        
         device["identifiers"][0] = getIdentifier();
         device["name"] = getName();
         device["model"] = getModel();
@@ -188,7 +197,7 @@ public:
     String getOnlineState() const;
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) const = 0;
+    virtual void addConfig(JsonDocument &doc) const = 0;
 
     const MqttDevice *getDevice() const
     {
@@ -247,7 +256,7 @@ public:
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) const override
+    virtual void addConfig(JsonDocument &doc) const override
     {
         doc["payload_on"] = m_stateOn;
         doc["payload_off"] = m_stateOff;
@@ -285,7 +294,7 @@ public:
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) const override
+    virtual void addConfig(JsonDocument &doc) const override
     {
         switch (m_stateClass)
         {
@@ -333,7 +342,7 @@ public:
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) const override
+    virtual void addConfig(JsonDocument &doc) const override
     {
         doc["state_on"] = m_stateOn;
         doc["state_off"] = m_stateOff;
@@ -371,7 +380,7 @@ public:
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) const override
+    virtual void addConfig(JsonDocument &doc) const override
     {
         doc["state_on"] = m_stateOn;
         doc["state_off"] = m_stateOff;
@@ -406,7 +415,7 @@ public:
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) const override
+    virtual void addConfig(JsonDocument &doc) const override
     {
         doc["payload_press"] = m_statePress;
     }
@@ -435,7 +444,7 @@ public:
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) const override
+    virtual void addConfig(JsonDocument &doc) const override
     {
         for (uint i = 0; i < m_options.size(); i++)
         {
@@ -445,6 +454,62 @@ protected:
 
 private:
     std::vector<String> m_options;
+};
+
+
+class MqttNumber : public MqttEntity
+{
+public:
+    MqttNumber(MqttDevice *device, const char *objectId, const char *humanName)
+        : MqttEntity(device, objectId, "number", humanName)
+    {
+        setHasCommandTopic(true);
+    }
+
+    void setMin(float minValue)
+    {
+        m_min = minValue;
+    }
+
+    void setMax(float maxValue)
+    {
+        m_max = maxValue;
+    }
+
+    void setMode(NumberMode mode)
+    {
+        m_mode = mode;
+    }
+
+protected:
+    virtual void addConfig(JsonDocument &doc) const override
+    {
+        if (m_min != FLT_MIN)
+        {
+            doc["min"] = m_min;
+        }
+        if (m_max != FLT_MAX)
+        {
+            doc["max"] = m_max;
+        }
+        doc["step"] = m_step;
+
+        if(m_mode == NumberMode::SLIDER)
+        {
+            doc["mode"] = "slider";
+        }
+        else if(m_mode == NumberMode::BOX)
+        {
+            doc["mode"] = "box";
+        }
+    }
+
+private:
+    char m_pattern[255] = "";
+    float m_min = FLT_MIN;
+    float m_max = FLT_MAX;
+    float m_step = 1.0f;
+    NumberMode m_mode = NumberMode::AUTO;
 };
 
 class MqttText : public MqttEntity
@@ -472,7 +537,7 @@ public:
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) const override
+    virtual void addConfig(JsonDocument &doc) const override
     {
         if (strlen(m_pattern) > 0)
         {
@@ -539,7 +604,7 @@ public:
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) const override
+    virtual void addConfig(JsonDocument &doc) const override
     {
         doc["payload_lock"] = m_cmdLock;
         doc["payload_unlock"] = m_cmdUnlock;
@@ -612,7 +677,7 @@ public:
     }
 
 protected:
-    virtual void addConfig(DynamicJsonDocument &doc) const override
+    virtual void addConfig(JsonDocument &doc) const override
     {
         doc["payload_open"] = m_cmdOpen;
         doc["payload_close"] = m_cmdClose;
