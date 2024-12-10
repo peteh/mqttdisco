@@ -2,7 +2,7 @@
 
 String MqttEntity::getHomeAssistantConfigPayload() const
 {
-    DynamicJsonDocument doc(4096);
+    JsonDocument doc;
 
     // if we give no human name to the entity
     // it will get the name of the device instead
