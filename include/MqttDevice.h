@@ -481,6 +481,11 @@ public:
         m_mode = mode;
     }
 
+    void setStep(float step)
+    {
+        m_step = step;
+    }
+
 protected:
     virtual void addConfig(JsonDocument &doc) const override
     {
