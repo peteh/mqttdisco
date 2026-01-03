@@ -151,11 +151,6 @@ public:
         m_valueTemplate = valueTemplate;
     }
 
-    void setIconTemplate(const char *iconTemplate)
-    {
-        m_iconTemplate = iconTemplate;
-    }
-
     void setUnit(const char *unit)
     {
         strncpy(m_unit, unit, sizeof(m_unit));
@@ -226,7 +221,6 @@ private:
     char m_cmdTopic[255] = "";
     char m_stateTopic[255] = "";
     String m_valueTemplate = "";
-    String m_iconTemplate = "";
     char m_unit[10] = "";
     char m_deviceClass[32] = "";
     char m_icon[128] = "";

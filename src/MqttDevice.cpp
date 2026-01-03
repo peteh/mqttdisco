@@ -39,11 +39,6 @@ String MqttEntity::getHomeAssistantConfigPayload() const
         doc["value_template"] = m_valueTemplate;
     }
 
-    if (m_iconTemplate.length() != 0)
-    {
-        doc["icon_template"] = m_iconTemplate;
-    }
-
     if (strlen(m_unit) > 0)
     {
         doc["unit_of_measurement"] = m_unit;
