@@ -98,6 +98,7 @@ private:
     char m_manufacturer[64];
     char m_swVersion[16];
     char m_configurationUrl[256];
+
 };
 
 class MqttEntity
@@ -147,7 +148,12 @@ public:
 
     void setValueTemplate(const char *valueTemplate)
     {
-        strncpy(m_valueTemplate, valueTemplate, sizeof(m_valueTemplate));
+        m_valueTemplate = valueTemplate;
+    }
+
+    void setIconTemplate(const char *iconTemplate)
+    {
+        m_iconTemplate = iconTemplate;
     }
 
     void setUnit(const char *unit)
@@ -219,7 +225,8 @@ private:
     bool m_hasCommandTopic = false;
     char m_cmdTopic[255] = "";
     char m_stateTopic[255] = "";
-    char m_valueTemplate[255] = "";
+    String m_valueTemplate = "";
+    String m_iconTemplate = "";
     char m_unit[10] = "";
     char m_deviceClass[32] = "";
     char m_icon[128] = "";

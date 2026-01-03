@@ -34,9 +34,14 @@ String MqttEntity::getHomeAssistantConfigPayload() const
     // add the other configurations
     addConfig(doc);
 
-    if (m_valueTemplate[0] != 0)
+    if (m_valueTemplate.length() != 0)
     {
         doc["value_template"] = m_valueTemplate;
+    }
+
+    if (m_iconTemplate.length() != 0)
+    {
+        doc["icon_template"] = m_iconTemplate;
     }
 
     if (strlen(m_unit) > 0)
